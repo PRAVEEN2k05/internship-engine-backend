@@ -30,6 +30,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from recommender import search_jobs
 import os
+import uvicorn
 
 app = FastAPI()
 
@@ -45,16 +46,11 @@ app.add_middleware(
 def home():
     return {"message": "Backend running 🚀"}
 
-
 @app.get("/search")
 def search(query: str = ""):
     if not query.strip():
         return {"results": []}
     return {"results": search_jobs(query)}
-
-
-# 🔥 FORCE SERVER START (NO __main__)
-import uvicorn
 
 port = int(os.environ.get("PORT", 10000))
 print(f"🚀 Starting server on port {port}")

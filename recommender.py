@@ -57,24 +57,29 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import re
 
-# Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "data", "internships_cleaned_small.pkl")
 FAISS_PATH = os.path.join(BASE_DIR, "data", "faiss_index.index")
 
-# 🚨 DO NOT load model at startup
-model = None
-
 print("📂 Loading dataset...")
-df = pickle.load(open(DATA_PATH, "rb"))
 
-# Handle FAISS safely
+# ✅ SAFE LOAD DATA
+if os.path.exists(DATA_PATH):
+    df = pickle.load(open(DATA_PATH, "rb"))
+else:
+    print("❌ Dataset missing")
+    df = None
+
+# ✅ SAFE LOAD FAISS
 if os.path.exists(FAISS_PATH):
     print("⚡ Loading FAISS index...")
     index = faiss.read_index(FAISS_PATH)
 else:
-    print("⚠️ FAISS index not found — fallback mode")
+    print("⚠️ FAISS not found → fallback mode")
     index = None
+
+# 🔥 LAZY MODEL
+model = None
 
 
 def clean_text(text):
@@ -86,25 +91,26 @@ def clean_text(text):
 def search_jobs(query, top_k=10):
     global model
 
+    if df is None:
+        return []
+
     query = clean_text(query)
 
-    # 🔥 LAZY LOAD MODEL (Fix for Render crash)
+    # Load model only when needed
     if model is None:
-        print("🚀 Loading model (lazy)...")
+        print("🚀 Loading model...")
         model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-    # 🔥 If FAISS not available → fallback
+    # Fallback if FAISS missing
     if index is None:
         return df.head(10)[["title", "company_name", "location"]].to_dict(orient="records")
 
-    # Encode query
     query_embedding = model.encode(
         [query],
         convert_to_numpy=True,
         normalize_embeddings=True
     )
 
-    # Search
     distances, indices = index.search(query_embedding, top_k)
 
     results = df.iloc[indices[0]]
