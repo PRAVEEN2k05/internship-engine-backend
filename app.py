@@ -29,8 +29,6 @@ def search(query: str = ""):
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from recommender import search_jobs
-import os
-import uvicorn
 
 app = FastAPI()
 
@@ -51,8 +49,3 @@ def search(query: str = ""):
     if not query.strip():
         return {"results": []}
     return {"results": search_jobs(query)}
-
-port = int(os.environ.get("PORT", 10000))
-print(f"🚀 Starting server on port {port}")
-
-uvicorn.run(app, host="0.0.0.0", port=port)
