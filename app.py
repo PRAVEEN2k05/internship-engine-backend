@@ -24,7 +24,8 @@ def search(query: str = ""):
         return {"results": []}
 
     results = search_jobs(query)
-    return {"results": results}'''
+    return {"results": results}
+'''
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
