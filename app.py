@@ -32,10 +32,9 @@ from recommender import search_jobs
 
 app = FastAPI()
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,5 +49,4 @@ def search(query: str = ""):
     if not query.strip():
         return {"results": []}
 
-    results = search_jobs(query)
-    return {"results": results}
+    return {"results": search_jobs(query)}
