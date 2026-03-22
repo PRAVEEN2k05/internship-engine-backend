@@ -58,6 +58,7 @@ import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
 
+
 def generate_embeddings():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_PATH = os.path.join(BASE_DIR, "data", "internships_cleaned_small.pkl")
@@ -83,8 +84,8 @@ def generate_embeddings():
 
     print("💾 Saving FAISS index...")
     faiss.write_index(index, FAISS_PATH)
-
     print("✅ Done!")
+
 
 if __name__ == "__main__":
     generate_embeddings()

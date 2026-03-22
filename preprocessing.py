@@ -33,11 +33,13 @@ import os
 import pandas as pd
 import re
 
+
 def clean_text(text):
     text = str(text).lower()
-    text = re.sub(r"[^a-z0-9\s]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"[^a-z0-9\s]", " ", text)   # ✅ raw string
+    text = re.sub(r"\s+", " ", text).strip()     # ✅ raw string
     return text
+
 
 def preprocess():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -53,9 +55,9 @@ def preprocess():
     )
 
     df = df.sample(n=1000, random_state=42)
-
     df.to_pickle(OUTPUT_PATH)
     print("✅ Preprocessing done")
+
 
 if __name__ == "__main__":
     preprocess()

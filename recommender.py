@@ -63,14 +63,12 @@ FAISS_PATH = os.path.join(BASE_DIR, "data", "faiss_index.index")
 
 print("📂 Loading dataset...")
 
-# ✅ SAFE LOAD DATA
 if os.path.exists(DATA_PATH):
     df = pickle.load(open(DATA_PATH, "rb"))
 else:
     print("❌ Dataset missing")
     df = None
 
-# ✅ SAFE LOAD FAISS
 if os.path.exists(FAISS_PATH):
     print("⚡ Loading FAISS index...")
     index = faiss.read_index(FAISS_PATH)
@@ -78,13 +76,13 @@ else:
     print("⚠️ FAISS not found → fallback mode")
     index = None
 
-# 🔥 LAZY MODEL
 model = None
 
 
 def clean_text(text):
     text = str(text).lower()
-    text = re.sub(r"[^a-z0-9\s]", " ", text)
+    text = re.sub(r"[^a-z0-9\s]", " ", text)   # ✅ raw string
+    text = re.sub(r"\s+", " ", text).strip()     # ✅ raw string
     return text
 
 
@@ -96,12 +94,10 @@ def search_jobs(query, top_k=10):
 
     query = clean_text(query)
 
-    # Load model only when needed
     if model is None:
         print("🚀 Loading model...")
         model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-    # Fallback if FAISS missing
     if index is None:
         return df.head(10)[["title", "company_name", "location"]].to_dict(orient="records")
 
@@ -112,7 +108,6 @@ def search_jobs(query, top_k=10):
     )
 
     distances, indices = index.search(query_embedding, top_k)
-
     results = df.iloc[indices[0]]
 
     return results[["title", "company_name", "location"]].to_dict(orient="records")
